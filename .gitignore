@@ -1,0 +1,16 @@
+.env
+.env.*
+__pycache__/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.venv/
+venv/
+dist/
+build/
+*.pyc
+*.pyo
+*.pyd
+*.DS_Store
+backend/.streamlit/
+frontend/.streamlit/
