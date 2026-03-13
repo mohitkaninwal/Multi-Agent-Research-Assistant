@@ -22,9 +22,12 @@ def writer_node(state: ResearchState) -> ResearchState:
         [
             SystemMessage(
                 content=(
-                    "You are a research writer. Write a structured markdown report with "
-                    "an introduction, section per sub-topic, a conclusion, and caveats. "
-                    "Use only the supplied summaries and explicitly mention uncertainties."
+                    "You are a research writer. Write a concise markdown brief that is crisp, "
+                    "accurate, and easy to scan. Keep the total answer roughly 220-350 words. "
+                    "Use this structure only: a short direct answer, 3-5 bullet points with the "
+                    "most important findings, and a short caveat section if needed. "
+                    "Do not expand into long paragraphs. Use only the supplied summaries and "
+                    "explicitly mention uncertainties."
                 )
             ),
             HumanMessage(

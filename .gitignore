@@ -14,3 +14,5 @@ build/
 *.DS_Store
 backend/.streamlit/
 frontend/.streamlit/
+frontend/node_modules/
+frontend/.next/

@@ -2,8 +2,8 @@
 
 AutoResearch is a multi-agent research assistant split into two deployable apps:
 
-- `backend/`: FastAPI + LangGraph orchestration + Tavily research tools
-- `frontend/`: Streamlit UI that consumes the backend over HTTP
+- `backend/`: FastAPI + LangGraph orchestration + Groq LLM + Tavily research tools
+- `frontend/`: Next.js UI that consumes the backend over HTTP
 
 This structure keeps deployment simple: the backend can run on Railway, Render, Fly, or a container platform, while the Streamlit frontend can be hosted separately on Streamlit Community Cloud or another lightweight app host.
 
@@ -32,8 +32,9 @@ backend/
   run_api.py
   requirements.txt
 frontend/
-  app.py
-  requirements.txt
+  app/
+  package.json
+  next.config.ts
 AutoResearch_TodoList.md
 ```
 
@@ -54,19 +55,17 @@ Frontend:
 
 ```bash
 cd frontend
-python -m venv .venv
-source .venv/bin/activate
-pip install -r requirements.txt
-cp .env.example .env
-streamlit run app.py
+npm install
+cp .env.example .env.local
+npm run dev
 ```
 
 ## Deployment Guidance
 
 - Deploy `backend/` as an API service.
-- Deploy `frontend/` as a separate Streamlit app.
-- Configure `BACKEND_BASE_URL` on the frontend to point to the deployed backend.
-- Configure API keys only on the backend.
+- Deploy `frontend/` as a separate Next.js app.
+- Configure `NEXT_PUBLIC_BACKEND_BASE_URL` on the frontend to point to the deployed backend.
+- Configure `GROQ_API_KEY`, `TAVILY_API_KEY`, and optional Langfuse keys only on the backend.
 
 ## Evaluation
 
@@ -78,4 +77,3 @@ python -m app.utils.eval
 ```
 
 This generates CSV output comparing the multi-agent pipeline against a single-agent baseline.
-# Multi-Agent-Research-Assistant

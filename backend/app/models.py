@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Any
+from typing import Any, Optional
 
 from pydantic import BaseModel, Field
 
@@ -9,7 +9,7 @@ class SearchResult(BaseModel):
     title: str
     url: str
     content: str = ""
-    score: float | None = None
+    score: Optional[float] = None
     raw: dict[str, Any] = Field(default_factory=dict)
 
 

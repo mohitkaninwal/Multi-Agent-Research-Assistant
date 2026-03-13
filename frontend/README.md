@@ -1,13 +1,13 @@
 # AutoResearch Frontend
 
-Streamlit app for the AutoResearch UI. This app is intentionally isolated from backend code so it can be deployed independently.
+Next.js frontend for AutoResearch. The UI is intentionally deployed separately from the FastAPI backend.
 
 ## Run locally
 
 ```bash
-pip install -r requirements.txt
-cp .env.example .env
-streamlit run app.py
+npm install
+cp .env.example .env.local
+npm run dev
 ```
 
-Set `BACKEND_BASE_URL` in `.env` if the backend is not running on `http://localhost:8000`.
+Set `NEXT_PUBLIC_BACKEND_BASE_URL` if the backend is not running on `http://localhost:8000`.

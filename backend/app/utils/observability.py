@@ -1,11 +1,11 @@
 from __future__ import annotations
 
-from typing import Any
+from typing import Any, Optional
 
 from app.config import get_settings
 
 
-def get_langfuse_handler() -> Any | None:
+def get_langfuse_handler() -> Optional[Any]:
     settings = get_settings()
     if not settings.langfuse_public_key or not settings.langfuse_secret_key:
         return None

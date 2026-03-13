@@ -21,9 +21,10 @@ def summarizer_node(state: ResearchState) -> ResearchState:
             [
                 SystemMessage(
                     content=(
-                        "You are a research summarizer. Produce a concise 2-3 sentence "
-                        "summary grounded only in the provided evidence. Mention uncertainty "
-                        "when sources are sparse or disagree."
+                        "You are a research summarizer. Produce a concise 1-2 sentence "
+                        "summary grounded only in the provided evidence. Keep only the most "
+                        "decision-relevant facts. Mention uncertainty when sources are sparse "
+                        "or disagree."
                     )
                 ),
                 HumanMessage(

@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import time
+from typing import Optional
 
 from tavily import TavilyClient
 
@@ -15,7 +16,7 @@ class TavilySearchTool:
         self._client = TavilyClient(api_key=settings.tavily_api_key)
         self._delay_seconds = settings.search_delay_seconds
 
-    def search(self, query: str, max_results: int | None = None) -> list[dict]:
+    def search(self, query: str, max_results: Optional[int] = None) -> list[dict]:
         settings = get_settings()
         response = self._client.search(
             query=query,

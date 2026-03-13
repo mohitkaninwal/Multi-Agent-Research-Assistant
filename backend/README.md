@@ -32,6 +32,6 @@ python main.py "What is quantum computing?"
 
 ## Notes
 
-- Set `LLM_PROVIDER=openai` with `OPENAI_API_KEY`, or `LLM_PROVIDER=anthropic` with `ANTHROPIC_API_KEY`.
+- Set `GROQ_API_KEY` to enable the Groq-hosted `llama-3.3-70b-versatile` model.
 - Set `TAVILY_API_KEY` to enable live web research.
 - Set Langfuse credentials if you want traces and prompt observability.
