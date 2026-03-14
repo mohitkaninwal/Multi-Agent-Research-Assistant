@@ -235,6 +235,7 @@
 }
 
 .mainColumn {
+  --input-dock-space: 196px;
   min-width: 0;
   display: grid;
   grid-template-rows: minmax(0, 1fr) auto;
@@ -319,8 +320,9 @@
   min-height: 0;
   overflow: auto;
   padding-right: 8px;
-  padding-bottom: 12px;
+  padding-bottom: var(--input-dock-space);
   overscroll-behavior: contain;
+  scroll-padding-bottom: var(--input-dock-space);
 }
 
 .greeting {
@@ -786,5 +788,9 @@
 
   .inputRow {
     border-radius: 26px;
+  }
+
+  .mainColumn {
+    --input-dock-space: 220px;
   }
 }

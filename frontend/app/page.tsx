@@ -23,9 +23,8 @@ type StreamEvent = {
 
 type HistoryCard = {
   id: string;
-  title: string;
-  subtitle: string;
   query: string;
+  timestamp: string;
 };
 
 type ChatMessage = {
@@ -36,27 +35,6 @@ type ChatMessage = {
   timestamp: string;
   steps?: string[];
 };
-
-const starterHistory: HistoryCard[] = [
-  {
-    id: "autonomous-mobility",
-    title: "Autonomous mobility",
-    subtitle: "Urban pilot programs, regulation, sensor stacks",
-    query: "Analyze the risks and opportunities of autonomous vehicles.",
-  },
-  {
-    id: "quantum-progress",
-    title: "Quantum progress",
-    subtitle: "Industry progress, academic research, hardware bottlenecks",
-    query: "Compare quantum computing progress across academia and industry.",
-  },
-  {
-    id: "reduce-cac",
-    title: "How to reduce CAC?",
-    subtitle: "Funnel analysis, retention loops, paid mix efficiency",
-    query: "What are the most effective ways to reduce CAC while preserving LTV?",
-  },
-];
 
 const starterPrompts = [
   "Summarize the latest enterprise use cases for small language models.",
@@ -94,7 +72,7 @@ export default function Home() {
   const [error, setError] = useState("");
   const [copied, setCopied] = useState(false);
   const [activeView, setActiveView] = useState<"answer" | "process" | "sources">("answer");
-  const [recentRuns, setRecentRuns] = useState<HistoryCard[]>(starterHistory);
+  const [recentRuns, setRecentRuns] = useState<HistoryCard[]>([]);
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [leftCollapsed, setLeftCollapsed] = useState(false);
   const [rightCollapsed, setRightCollapsed] = useState(false);
@@ -127,8 +105,6 @@ export default function Home() {
       })),
     [steps],
   );
-
-  const answerPreview = finalReport ? finalReport.slice(0, 260) : "";
 
   function stopStream() {
     eventSourceRef.current?.close();
@@ -208,9 +184,8 @@ export default function Home() {
     setRecentRuns((current) => {
       const nextItem: HistoryCard = {
         id: normalizedQuery.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, ""),
-        title: normalizedQuery.length > 34 ? `${normalizedQuery.slice(0, 34)}...` : normalizedQuery,
-        subtitle: "Recent research run",
         query: normalizedQuery,
+        timestamp,
       };
       return [nextItem, ...current.filter((item) => item.query !== normalizedQuery)].slice(0, 6);
     });
@@ -365,7 +340,7 @@ export default function Home() {
           <header className={styles.panelHeader}>
             <div>
               <h1>Chat Results</h1>
-              <p>Recent research prompts</p>
+              <p>Previous conversations from this session</p>
             </div>
             <button
               className={styles.panelToggle}
@@ -378,26 +353,32 @@ export default function Home() {
 
           {!leftCollapsed ? (
             <div className={styles.historyList}>
-              {recentRuns.map((card, index) => (
-                <button
-                  key={`${card.id}-${index}`}
-                  className={`${styles.historyListCard} ${styles.historyButton}`}
-                  onClick={() => startResearch(card.query)}
-                  type="button"
-                >
-                  <div className={styles.historyTop}>
-                    <div>
-                      <p className={styles.cardEyebrow}>{index === 0 ? "Latest run" : "Recent run"}</p>
-                      <span className={styles.cardMeta}>{card.subtitle}</span>
+              {recentRuns.length === 0 ? (
+                <div className={styles.historyListCard}>
+                  <p className={styles.cardEyebrow}>No conversations yet</p>
+                  <span className={styles.cardMeta}>Start a chat to see it listed here.</span>
+                </div>
+              ) : (
+                recentRuns.map((card, index) => (
+                  <button
+                    key={`${card.id}-${index}`}
+                    className={`${styles.historyListCard} ${styles.historyButton}`}
+                    onClick={() => startResearch(card.query)}
+                    type="button"
+                  >
+                    <div className={styles.historyTop}>
+                      <div>
+                        <p className={styles.cardEyebrow}>{index === 0 ? "Latest run" : "Previous conversation"}</p>
+                        <span className={styles.cardMeta}>{card.timestamp}</span>
+                      </div>
+                      <span className={styles.arrowBadge}>↗</span>
                     </div>
-                    <span className={styles.arrowBadge}>↗</span>
-                  </div>
-                  <div className={styles.searchSnippet}>
-                    <strong>{card.title}</strong>
-                    <span>{card.query}</span>
-                  </div>
-                </button>
-              ))}
+                    <div className={styles.searchSnippet}>
+                      <span>{card.query}</span>
+                    </div>
+                  </button>
+                ))
+              )}
             </div>
           ) : null}
         </section>
@@ -525,93 +506,32 @@ export default function Home() {
                 </div>
                 {!rightCollapsed ? (
                   <>
-                <div className={styles.sidebarActions}>
-                  <button className={styles.toolTile} onClick={() => setActiveView("process")} type="button">
-                    <span className={styles.toolIcon}>⌘</span>
-                    <div>
-                      <strong>Process</strong>
-                      <span>See agent steps</span>
+                    <div className={styles.statusHeader}>
+                      <div>
+                        <p className={styles.statusEyebrow}>Run status</p>
+                        <h4>{status}</h4>
+                      </div>
+                      <span className={isRunning ? styles.statusPillLive : styles.statusPillIdle}>
+                        {isRunning ? "Streaming" : "Ready"}
+                      </span>
                     </div>
-                  </button>
-                  <button className={`${styles.toolTile} ${styles.toolTileFeatured}`} onClick={jumpToAnswer} type="button">
-                    <span className={styles.toolIcon}>◌</span>
-                    <div>
-                      <strong>Answer</strong>
-                      <span>Jump to result</span>
+
+                    {error ? <p className={styles.errorText}>{error}</p> : null}
+
+                    <div className={styles.statusGrid}>
+                      <div className={styles.metricCard}>
+                        <span>Sub-topics</span>
+                        <strong>{subTopics.length}</strong>
+                      </div>
+                      <div className={styles.metricCard}>
+                        <span>Contradictions</span>
+                        <strong>{contradictions.length}</strong>
+                      </div>
+                      <div className={styles.metricCard}>
+                        <span>References</span>
+                        <strong>{references.length}</strong>
+                      </div>
                     </div>
-                  </button>
-                  <button className={styles.toolTile} onClick={() => setActiveView("sources")} type="button">
-                    <span className={styles.toolIcon}>⇄</span>
-                    <div>
-                      <strong>Sources</strong>
-                      <span>Open references</span>
-                    </div>
-                  </button>
-                  <button className={styles.toolTile} onClick={copyReport} type="button">
-                    <span className={styles.toolIcon}>◍</span>
-                    <div>
-                      <strong>{copied ? "Copied" : "Copy"}</strong>
-                      <span>Save answer text</span>
-                    </div>
-                  </button>
-                </div>
-
-                <div className={styles.statusHeader}>
-                  <div>
-                    <p className={styles.statusEyebrow}>Run status</p>
-                    <h4>{status}</h4>
-                  </div>
-                  <span className={isRunning ? styles.statusPillLive : styles.statusPillIdle}>
-                    {isRunning ? "Streaming" : "Ready"}
-                  </span>
-                </div>
-
-                {error ? <p className={styles.errorText}>{error}</p> : null}
-
-                <div className={styles.statusGrid}>
-                  <div className={styles.metricCard}>
-                    <span>Sub-topics</span>
-                    <strong>{subTopics.length}</strong>
-                  </div>
-                  <div className={styles.metricCard}>
-                    <span>Contradictions</span>
-                    <strong>{contradictions.length}</strong>
-                  </div>
-                  <div className={styles.metricCard}>
-                    <span>References</span>
-                    <strong>{references.length}</strong>
-                  </div>
-                </div>
-
-                <div className={styles.detailsGrid}>
-                  <div className={styles.detailColumn}>
-                    <h5>Sub-topics</h5>
-                    <ul>
-                      {subTopics.length > 0 ? subTopics.map((topic) => <li key={topic}>{topic}</li>) : <li>Waiting for planner output.</li>}
-                    </ul>
-                  </div>
-                  <div className={styles.detailColumn}>
-                    <h5>Flags</h5>
-                    <ul>
-                      {contradictions.length > 0 ? (
-                        contradictions.slice(0, 4).map((item) => <li key={item}>{item}</li>)
-                      ) : (
-                        <li>No contradictions flagged yet.</li>
-                      )}
-                    </ul>
-                  </div>
-                </div>
-
-                <div className={styles.finalReport}>
-                  <h5>Quick summary</h5>
-                  <div className={styles.reportOutput}>
-                    {finalReport ? (
-                      <p>{answerPreview}...</p>
-                    ) : (
-                      <p>Run a query and the answer preview will appear here.</p>
-                    )}
-                  </div>
-                </div>
                   </>
                 ) : null}
               </section>
